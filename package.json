@@ -10,7 +10,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "biome check . --max-diagnostics 1000",
-    "lint:fix": "biome lint --unsafe . --max-diagnostics 1000",
+    "lint:fix": "biome check --write --unsafe . --max-diagnostics 1000",
     "format": "biome format --write ."
   },
   "dependencies": {

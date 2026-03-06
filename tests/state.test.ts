@@ -20,9 +20,9 @@ describe("agent seeding", () => {
   it("should have Whip agent with correct data", () => {
     const whip = getAgent("agent-whip");
     expect(whip).toBeDefined();
-    expect(whip!.name).toBe("Alice");
-    expect(whip!.role).toBe("Whip");
-    expect(whip!.status).toBe("idle");
+    expect(whip?.name).toBe("Alice");
+    expect(whip?.role).toBe("Whip");
+    expect(whip?.status).toBe("idle");
   });
 });
 
@@ -49,7 +49,7 @@ describe("createTask", () => {
     const found = tasks.find((t) => t.id === task.id);
 
     expect(found).toBeDefined();
-    expect(found!.title).toBe("Write tests");
+    expect(found?.title).toBe("Write tests");
   });
 });
 
@@ -61,8 +61,8 @@ describe("assignTask", () => {
     const tasks = getTasks();
     const updated = tasks.find((t) => t.id === task.id);
 
-    expect(updated!.assignedTo).toBe("agent-dev1");
-    expect(updated!.status).toBe("in_progress");
+    expect(updated?.assignedTo).toBe("agent-dev1");
+    expect(updated?.status).toBe("in_progress");
   });
 });
 
@@ -75,7 +75,7 @@ describe("completeTask", () => {
     const tasks = getTasks();
     const updated = tasks.find((t) => t.id === task.id);
 
-    expect(updated!.status).toBe("done");
+    expect(updated?.status).toBe("done");
   });
 
   it("should set status to failed on failure", () => {
@@ -86,7 +86,7 @@ describe("completeTask", () => {
     const tasks = getTasks();
     const updated = tasks.find((t) => t.id === task.id);
 
-    expect(updated!.status).toBe("failed");
+    expect(updated?.status).toBe("failed");
   });
 });
 

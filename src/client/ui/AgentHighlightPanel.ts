@@ -74,5 +74,5 @@ export class AgentHighlightPanel {
 }
 
 function truncate(text: string, maxLen: number): string {
-  return text.length > maxLen ? text.slice(0, maxLen - 3) + "..." : text;
+  return text.length > maxLen ? `${text.slice(0, maxLen - 3)}...` : text;
 }

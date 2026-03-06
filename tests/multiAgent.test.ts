@@ -42,7 +42,7 @@ describe("task lifecycle via state", () => {
     completeTask(task.id, true);
     const allTasks = getTasks();
     const done = allTasks.find((t) => t.id === task.id);
-    expect(done!.status).toBe("done");
+    expect(done?.status).toBe("done");
   });
 });
 

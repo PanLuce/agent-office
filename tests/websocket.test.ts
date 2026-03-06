@@ -105,7 +105,7 @@ describe("WebSocket start flow", () => {
     const startAck = messages.find((m) => m.type === "start_ack");
     expect(startAck).toBeDefined();
 
-    const ackPayload = startAck!.payload as { started: boolean; directory: string };
+    const ackPayload = startAck?.payload as { started: boolean; directory: string };
     expect(ackPayload.started).toBe(true);
     expect(ackPayload.directory).toBe("/tmp/ws-test");
   });
@@ -120,7 +120,7 @@ describe("WebSocket start flow", () => {
     const event = messages.find((m) => m.type === "event");
     expect(event).toBeDefined();
 
-    const eventPayload = event!.payload as { agentId: string; eventType: string; detail: string };
+    const eventPayload = event?.payload as { agentId: string; eventType: string; detail: string };
     expect(eventPayload.agentId).toBe("system");
     expect(eventPayload.eventType).toBe("connected");
     expect(eventPayload.detail).toContain("ws-test-2");
