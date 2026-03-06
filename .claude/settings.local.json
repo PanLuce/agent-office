@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:stroeer-labs-600765955058.d.codeartifact.eu-central-1.amazonaws.com)",
+      "WebFetch(domain:registry.npmjs.org)",
+      "Bash(npx tsx:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npm run:*)",
+      "Bash(lsof:*)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:release-assets.githubusercontent.com)",
+      "WebFetch(domain:localhost)",
+      "Read(//private/tmp/claude-501/**)",
+      "Read(//private/tmp/**)",
+      "Bash(kill:*)",
+      "Bash(curl:*)",
+      "Bash(bash:*)",
+      "Bash(source:*)",
+      "Bash(/Users/lukasvitala/GIT/agent-office/node_modules/.bin/claude:*)",
+      "Bash(npx vitest:*)",
+      "Bash(npm install:*)",
+      "Bash(chmod +x:*)",
+      "Bash(.claude/hooks/on-session-start.sh:*)",
+      "Bash(ls:*)",
+      "Bash(npx biome:*)"
+    ]
+  }
+}

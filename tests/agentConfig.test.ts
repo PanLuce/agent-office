@@ -1,0 +1,108 @@
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import path from "node:path";
+import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { loadAgentConfig, resolveAllowedTools } from "../src/server/agentConfig.js";
+
+describe("loadAgentConfig", () => {
+  let configDir: string;
+
+  beforeEach(() => {
+    configDir = mkdtempSync(path.join(tmpdir(), "agent-config-test-"));
+  });
+
+  afterEach(() => {
+    rmSync(configDir, { recursive: true, force: true });
+  });
+
+  it("should load allowedTools from a valid config file", () => {
+    const config = { allowedTools: ["Read", "Write", "Bash"] };
+    writeFileSync(path.join(configDir, "dev-1.json"), JSON.stringify(config));
+
+    const result = loadAgentConfig("agent-dev1", configDir);
+
+    expect(result.allowedTools).toEqual(["Read", "Write", "Bash"]);
+  });
+
+  it("should return empty config when file does not exist", () => {
+    const result = loadAgentConfig("agent-dev1", configDir);
+
+    expect(result).toEqual({});
+  });
+
+  it("should return empty config when file contains invalid JSON", () => {
+    writeFileSync(path.join(configDir, "dev-1.json"), "not json {{{");
+
+    const result = loadAgentConfig("agent-dev1", configDir);
+
+    expect(result).toEqual({});
+  });
+
+  it("should return config without allowedTools when key is missing", () => {
+    writeFileSync(path.join(configDir, "dev-1.json"), JSON.stringify({ other: "value" }));
+
+    const result = loadAgentConfig("agent-dev1", configDir);
+
+    expect(result.allowedTools).toBeUndefined();
+  });
+
+  it("should map each agent ID to the correct config filename", () => {
+    const mapping: Record<string, string> = {
+      "agent-whip": "whip.json",
+      "agent-architect": "architect.json",
+      "agent-dev1": "dev-1.json",
+      "agent-dev2": "dev-2.json",
+      "agent-tester": "tester.json",
+      "agent-devops": "devops.json",
+    };
+
+    for (const [agentId, filename] of Object.entries(mapping)) {
+      const config = { allowedTools: ["Read"] };
+      writeFileSync(path.join(configDir, filename), JSON.stringify(config));
+
+      const result = loadAgentConfig(agentId, configDir);
+      expect(result.allowedTools).toEqual(["Read"]);
+    }
+  });
+});
+
+describe("resolveAllowedTools", () => {
+  let configDir: string;
+
+  beforeEach(() => {
+    configDir = mkdtempSync(path.join(tmpdir(), "agent-config-test-"));
+  });
+
+  afterEach(() => {
+    rmSync(configDir, { recursive: true, force: true });
+  });
+
+  it("should use config file tools when present", () => {
+    const config = { allowedTools: ["Read", "Bash"] };
+    writeFileSync(path.join(configDir, "dev-1.json"), JSON.stringify(config));
+
+    const tools = resolveAllowedTools("agent-dev1", "Dev-1", configDir);
+
+    expect(tools).toEqual(["Read", "Bash"]);
+  });
+
+  it("should fall back to role defaults when no config file exists", () => {
+    const tools = resolveAllowedTools("agent-dev1", "Dev-1", configDir);
+
+    expect(tools).toEqual(["Read", "Write", "Edit", "MultiEdit", "Bash", "Glob", "Grep"]);
+  });
+
+  it("should fall back to role defaults when config has no allowedTools", () => {
+    writeFileSync(path.join(configDir, "dev-1.json"), JSON.stringify({ other: true }));
+
+    const tools = resolveAllowedTools("agent-dev1", "Dev-1", configDir);
+
+    expect(tools).toEqual(["Read", "Write", "Edit", "MultiEdit", "Bash", "Glob", "Grep"]);
+  });
+
+  it("should return minimal defaults for unknown roles without config", () => {
+    const tools = resolveAllowedTools("agent-unknown", "Unknown", configDir);
+
+    expect(tools).toEqual(["Read", "Glob", "Grep"]);
+  });
+});
