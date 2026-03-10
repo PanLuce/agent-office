@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { AGENT_BY_ID } from "../shared/agentRegistry.js";
 import { getToolsForRole } from "./agentManager.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -8,21 +9,12 @@ const __dirname = path.dirname(__filename);
 
 const DEFAULT_CONFIG_DIR = path.resolve(__dirname, "../../../config/agents");
 
-const AGENT_ID_TO_CONFIG_FILE: Record<string, string> = {
-  "agent-whip": "whip",
-  "agent-architect": "architect",
-  "agent-dev1": "dev-1",
-  "agent-dev2": "dev-2",
-  "agent-tester": "tester",
-  "agent-devops": "devops",
-};
-
 export interface AgentConfig {
   allowedTools?: string[];
 }
 
 export function loadAgentConfig(agentId: string, configDir = DEFAULT_CONFIG_DIR): AgentConfig {
-  const slug = AGENT_ID_TO_CONFIG_FILE[agentId];
+  const slug = AGENT_BY_ID[agentId]?.configSlug;
   if (!slug) return {};
 
   const filePath = path.join(configDir, `${slug}.json`);

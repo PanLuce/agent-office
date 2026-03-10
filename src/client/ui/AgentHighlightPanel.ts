@@ -1,13 +1,7 @@
+import { AGENT_REGISTRY } from "../../shared/agentRegistry.js";
 import type { Agent, AgentEvent } from "../../shared/types.js";
 
-const ROLE_COLORS: Record<string, string> = {
-  Whip: "#e74c3c",
-  Architect: "#3498db",
-  "Dev-1": "#2ecc71",
-  "Dev-2": "#27ae60",
-  Tester: "#f39c12",
-  DevOps: "#9b59b6",
-};
+const ROLE_COLORS: Record<string, string> = Object.fromEntries(AGENT_REGISTRY.map((a) => [a.role, a.color]));
 
 export class AgentHighlightPanel {
   private panel: HTMLDivElement;
@@ -49,7 +43,7 @@ export class AgentHighlightPanel {
         : '<div style="color:#555;font-size:10px;">No recent events</div>';
 
     this.panel.innerHTML = `
-      <div style="color:${roleColor};font-weight:bold;">${agent.name} — ${agent.role}</div>
+      <div style="color:${roleColor};font-weight:bold;">${agent.role}</div>
       <div style="margin-top:4px;">Status: ${agent.status}</div>
       ${agent.currentTask ? `<div>Task: ${truncate(agent.currentTask, 40)}</div>` : ""}
       <div style="margin-top:6px;border-top:1px solid #333;padding-top:4px;">

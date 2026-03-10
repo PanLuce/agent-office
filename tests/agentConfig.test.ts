@@ -3,6 +3,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { loadAgentConfig, resolveAllowedTools } from "../src/server/agentConfig.js";
+import { AGENT_REGISTRY } from "../src/shared/agentRegistry.js";
 
 describe("loadAgentConfig", () => {
   let configDir: string;
@@ -47,20 +48,11 @@ describe("loadAgentConfig", () => {
   });
 
   it("should map each agent ID to the correct config filename", () => {
-    const mapping: Record<string, string> = {
-      "agent-whip": "whip.json",
-      "agent-architect": "architect.json",
-      "agent-dev1": "dev-1.json",
-      "agent-dev2": "dev-2.json",
-      "agent-tester": "tester.json",
-      "agent-devops": "devops.json",
-    };
-
-    for (const [agentId, filename] of Object.entries(mapping)) {
+    for (const def of AGENT_REGISTRY) {
       const config = { allowedTools: ["Read"] };
-      writeFileSync(path.join(configDir, filename), JSON.stringify(config));
+      writeFileSync(path.join(configDir, `${def.configSlug}.json`), JSON.stringify(config));
 
-      const result = loadAgentConfig(agentId, configDir);
+      const result = loadAgentConfig(def.id, configDir);
       expect(result.allowedTools).toEqual(["Read"]);
     }
   });

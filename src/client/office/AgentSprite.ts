@@ -1,23 +1,14 @@
 import { Container, Graphics, Text, TextStyle } from "pixi.js";
+import { AGENT_REGISTRY } from "../../shared/agentRegistry.js";
 import type { Agent, AgentStatus } from "../../shared/types.js";
 
-export const ROLE_COLORS: Record<string, number> = {
-  Whip: 0xe74c3c,
-  Architect: 0x3498db,
-  "Dev-1": 0x2ecc71,
-  "Dev-2": 0x27ae60,
-  Tester: 0xf39c12,
-  DevOps: 0x9b59b6,
-};
+export const ROLE_COLORS: Record<string, number> = Object.fromEntries(
+  AGENT_REGISTRY.map((a) => [a.role, Number.parseInt(a.color.slice(1), 16)]),
+);
 
-const SHIRT_COLORS: Record<string, number> = {
-  Whip: 0xe8e8e8,
-  Architect: 0x3498db,
-  "Dev-1": 0x2ecc71,
-  "Dev-2": 0x27ae60,
-  Tester: 0xf39c12,
-  DevOps: 0x9b59b6,
-};
+const SHIRT_COLORS: Record<string, number> = Object.fromEntries(
+  AGENT_REGISTRY.map((a) => [a.role, Number.parseInt(a.shirtColor.slice(1), 16)]),
+);
 
 const HAIR_STYLES: Record<string, { color: number; draw: (g: Graphics, x: number, y: number) => void }> = {
   Whip: {
@@ -60,7 +51,7 @@ const HAIR_STYLES: Record<string, { color: number; draw: (g: Graphics, x: number
       g.fill(0x4a4a5a);
     },
   },
-  Tester: {
+  Reviewer: {
     color: 0xd4a840,
     draw: (g, x, y) => {
       g.rect(x - 3, y - 2, 6, 2);
@@ -71,19 +62,21 @@ const HAIR_STYLES: Record<string, { color: number; draw: (g: Graphics, x: number
       g.fill(0xd4a840);
     },
   },
-  DevOps: {
-    color: 0x2a3a5a,
+  Sceptic: {
+    color: 0xe67e22,
     draw: (g, x, y) => {
       g.rect(x - 3, y - 2, 6, 2);
-      g.fill(0x2a3a5a);
-      // Beanie
+      g.fill(0xe67e22);
+      // Beret
       g.rect(x - 4, y - 4, 8, 2);
-      g.fill(0x3a3a6a);
+      g.fill(0xd35400);
       g.rect(x - 3, y - 5, 6, 1);
-      g.fill(0x3a3a6a);
+      g.fill(0xd35400);
     },
   },
 };
+
+export const HAIR_STYLE_ROLES: string[] = Object.keys(HAIR_STYLES);
 
 const STATUS_COLORS: Record<AgentStatus, number> = {
   idle: 0x5a5a5a,

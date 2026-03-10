@@ -3,6 +3,7 @@ import { existsSync, statSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { AGENT_BY_ROLE, buildTeamDescription } from "../shared/agentRegistry.js";
 import type { AgentStatus } from "../shared/types.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -107,36 +108,40 @@ export function findClaudeBinary(): string {
   return "claude";
 }
 
-const AGENT_NAME_TO_ID: Record<string, string> = {
-  Architect: "agent-architect",
-  "Dev-1": "agent-dev1",
-  "Dev-2": "agent-dev2",
-  Tester: "agent-tester",
-  DevOps: "agent-devops",
-};
+interface ClaudeArgsOptions {
+  systemPrompt?: string;
+  allowedTools?: string[];
+}
+
+interface ClaudeArgsResult {
+  args: string[];
+  useStdin: boolean;
+}
+
+export function buildClaudeArgs(options: ClaudeArgsOptions): ClaudeArgsResult {
+  const args = ["--print", "--output-format", "stream-json", "--verbose", "--max-turns", "30"];
+
+  if (options.systemPrompt) {
+    args.push("--system-prompt", options.systemPrompt);
+  }
+
+  if (options.allowedTools && options.allowedTools.length > 0) {
+    args.push("--allowedTools", ...options.allowedTools);
+  }
+
+  return { args, useStdin: true };
+}
 
 export function resolveAgentId(agentName: string): string | null {
-  return AGENT_NAME_TO_ID[agentName] ?? null;
+  return AGENT_BY_ROLE[agentName]?.id ?? null;
 }
-
-const ROLE_TOOLS: Record<string, string[]> = {
-  Architect: ["Read", "Glob", "Grep", "Write"],
-  "Dev-1": ["Read", "Write", "Edit", "MultiEdit", "Bash", "Glob", "Grep"],
-  "Dev-2": ["Read", "Write", "Edit", "MultiEdit", "Bash", "Glob", "Grep"],
-  Tester: ["Read", "Write", "Edit", "Bash", "Glob", "Grep"],
-  DevOps: ["Read", "Write", "Edit", "Bash", "Glob", "Grep"],
-};
 
 export function getToolsForRole(role: string): string[] {
-  return ROLE_TOOLS[role] ?? ["Read", "Glob", "Grep"];
+  return AGENT_BY_ROLE[role]?.defaultTools ?? ["Read", "Glob", "Grep"];
 }
 
-const WHIP_SYSTEM_PROMPT = `You are the Whip/lead of a 6-person dev team. Your teammates and their specialties:
-- Architect: system design, API design, documentation, planning
-- Dev-1: frontend development, React, UI components
-- Dev-2: backend development, APIs, databases, server code
-- Tester: writing tests, test plans, quality assurance
-- DevOps: CI/CD, deployment, infrastructure, scripting
+const WHIP_SYSTEM_PROMPT = `You are the Whip/lead of a dev team. Your teammates and their specialties:
+${buildTeamDescription()}
 
 When given a task, analyze it and break it into subtasks. For each subtask, output a JSON block:
 \`\`\`task
@@ -268,7 +273,7 @@ export class AgentManager {
       this.callbacks.onEvent(
         "agent-whip",
         "delegation",
-        `Assigning to ${agent.name}: ${assignment.task.slice(0, 100)}`,
+        `Assigning to ${agent.role}: ${assignment.task.slice(0, 100)}`,
       );
 
       // Stagger spawns by 1s each
@@ -296,7 +301,7 @@ export class AgentManager {
     assignTask(taskId, agentId);
     this.callbacks.onTaskChange?.();
 
-    const prompt = `You are ${agent.name}, the ${role} specialist. Complete this task in the project at ${this.workingDirectory}: ${taskDescription}\n\nWork independently. Be thorough but concise. When done, summarize what you did.`;
+    const prompt = `You are the ${role} specialist. Complete this task in the project at ${this.workingDirectory}: ${taskDescription}\n\nWork independently. Be thorough but concise. When done, summarize what you did.`;
 
     try {
       const tools = resolveAllowedTools(agentId, role);
@@ -362,17 +367,7 @@ export class AgentManager {
 
       const claudePath = this.findClaudeBinary();
 
-      const claudeArgs = ["--print", "--output-format", "stream-json", "--verbose", "--max-turns", "30"];
-
-      if (systemPrompt) {
-        claudeArgs.push("--system-prompt", systemPrompt);
-      }
-
-      if (allowedTools && allowedTools.length > 0) {
-        claudeArgs.push("--allowedTools", ...allowedTools);
-      }
-
-      claudeArgs.push(prompt);
+      const { args: claudeArgs } = buildClaudeArgs({ systemPrompt, allowedTools });
 
       const proc = spawn(claudePath, claudeArgs, {
         cwd: this.workingDirectory!,
@@ -428,6 +423,7 @@ export class AgentManager {
         reject(err);
       });
 
+      proc.stdin?.write(prompt);
       proc.stdin?.end();
     });
   }

@@ -81,7 +81,7 @@ describe("WebSocket connection", () => {
     const payload = message.payload as FullStatePayload;
     const roles = payload.agents.map((a) => a.role).sort();
 
-    expect(roles).toEqual(["Architect", "Dev-1", "Dev-2", "DevOps", "Tester", "Whip"]);
+    expect(roles).toEqual(["Architect", "Dev-1", "Dev-2", "Reviewer", "Sceptic", "Whip"]);
   });
 
   it("should have all agents in idle status initially", async () => {

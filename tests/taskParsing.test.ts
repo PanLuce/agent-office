@@ -61,13 +61,13 @@ not valid json
 
   it("should handle task blocks with extra whitespace", () => {
     const text = `\`\`\`task
-  { "assign": "Tester", "task": "Write unit tests" }
+  { "assign": "Reviewer", "task": "Review code quality" }
 \`\`\``;
 
     const tasks = parseTaskAssignments(text);
 
     expect(tasks).toHaveLength(1);
-    expect(tasks[0].assign).toBe("Tester");
+    expect(tasks[0].assign).toBe("Reviewer");
   });
 });
 
@@ -84,12 +84,12 @@ describe("resolveAgentId", () => {
     expect(resolveAgentId("Architect")).toBe("agent-architect");
   });
 
-  it("should resolve Tester to agent-tester", () => {
-    expect(resolveAgentId("Tester")).toBe("agent-tester");
+  it("should resolve Reviewer to agent-reviewer", () => {
+    expect(resolveAgentId("Reviewer")).toBe("agent-reviewer");
   });
 
-  it("should resolve DevOps to agent-devops", () => {
-    expect(resolveAgentId("DevOps")).toBe("agent-devops");
+  it("should resolve Sceptic to agent-sceptic", () => {
+    expect(resolveAgentId("Sceptic")).toBe("agent-sceptic");
   });
 
   it("should return null for unknown agent names", () => {
@@ -121,12 +121,13 @@ describe("getToolsForRole", () => {
     expect(tools).toContain("Bash");
   });
 
-  it("should give Tester testing tools", () => {
-    const tools = getToolsForRole("Tester");
+  it("should give Reviewer review tools", () => {
+    const tools = getToolsForRole("Reviewer");
 
     expect(tools).toContain("Read");
+    expect(tools).toContain("Glob");
+    expect(tools).toContain("Grep");
     expect(tools).toContain("Write");
-    expect(tools).toContain("Bash");
   });
 
   it("should return default tools for unknown roles", () => {

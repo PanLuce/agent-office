@@ -47,7 +47,7 @@ describe("GET /api/status", () => {
 
     const whip = body.agents.find((a: { role: string }) => a.role === "Whip");
     expect(whip).toBeDefined();
-    expect(whip.name).toBe("Alice");
+    expect(whip.name).toBe("Whip");
     expect(whip.status).toBe("idle");
   });
 });

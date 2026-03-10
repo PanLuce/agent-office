@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isAbortError, mapToolToFileAction, mapToolToStatus } from "../src/server/agentManager.js";
+import { buildClaudeArgs, isAbortError, mapToolToFileAction, mapToolToStatus } from "../src/server/agentManager.js";
 
 describe("mapToolToStatus", () => {
   it("should map Read to reviewing", () => {
@@ -52,6 +52,51 @@ describe("mapToolToFileAction", () => {
     expect(mapToolToFileAction("Read")).toBeNull();
     expect(mapToolToFileAction("Bash")).toBeNull();
     expect(mapToolToFileAction("Grep")).toBeNull();
+  });
+});
+
+describe("buildClaudeArgs", () => {
+  it("should not include prompt in args when allowedTools are present", () => {
+    const result = buildClaudeArgs({
+      systemPrompt: "You are helpful",
+      allowedTools: ["Read", "Write"],
+    });
+
+    expect(result.args).not.toContain("some prompt text");
+    expect(result.args).toContain("--allowedTools");
+    expect(result.args).toContain("Read");
+    expect(result.args).toContain("Write");
+    expect(result.useStdin).toBe(true);
+  });
+
+  it("should include base flags", () => {
+    const result = buildClaudeArgs({});
+
+    expect(result.args).toContain("--print");
+    expect(result.args).toContain("--output-format");
+    expect(result.args).toContain("stream-json");
+    expect(result.args).toContain("--verbose");
+    expect(result.args).toContain("--max-turns");
+    expect(result.args).toContain("30");
+  });
+
+  it("should include system prompt when provided", () => {
+    const result = buildClaudeArgs({ systemPrompt: "Be concise" });
+
+    expect(result.args).toContain("--system-prompt");
+    expect(result.args).toContain("Be concise");
+  });
+
+  it("should not include system prompt flag when not provided", () => {
+    const result = buildClaudeArgs({});
+
+    expect(result.args).not.toContain("--system-prompt");
+  });
+
+  it("should not include allowedTools flag when no tools provided", () => {
+    const result = buildClaudeArgs({});
+
+    expect(result.args).not.toContain("--allowedTools");
   });
 });
 

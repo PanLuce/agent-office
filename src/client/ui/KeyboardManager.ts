@@ -1,15 +1,11 @@
+import { AGENT_REGISTRY } from "../../shared/agentRegistry.js";
 import type { WSMessage } from "../../shared/types.js";
 
 type SendFn = (message: WSMessage) => void;
 
-const AGENT_KEYS: Record<string, { id: string; label: string }> = {
-  "1": { id: "agent-whip", label: "Whip" },
-  "2": { id: "agent-architect", label: "Architect" },
-  "3": { id: "agent-dev1", label: "Dev-1" },
-  "4": { id: "agent-dev2", label: "Dev-2" },
-  "5": { id: "agent-tester", label: "Tester" },
-  "6": { id: "agent-devops", label: "DevOps" },
-};
+const AGENT_KEYS: Record<string, { id: string; label: string }> = Object.fromEntries(
+  AGENT_REGISTRY.map((a) => [a.keyBinding, { id: a.id, label: a.role }]),
+);
 
 const HINT_STORAGE_KEY = "agent-office-shortcuts-used";
 

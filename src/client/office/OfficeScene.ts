@@ -1,4 +1,5 @@
 import { Container, Graphics, Text, TextStyle, type Ticker } from "pixi.js";
+import { AGENT_REGISTRY } from "../../shared/agentRegistry.js";
 import type { Agent, AgentStatus } from "../../shared/types.js";
 import { AgentSprite, ROLE_COLORS } from "./AgentSprite.js";
 import { AnimationManager } from "./AnimationManager.js";
@@ -28,14 +29,11 @@ const POINTS_OF_INTEREST = [
 
 const AGENT_SEEDS = [7, 13, 29, 41, 53, 67];
 
-const STATUS_BAR_AGENTS = [
-  { id: "agent-whip", label: "WH", role: "Whip" },
-  { id: "agent-architect", label: "AR", role: "Architect" },
-  { id: "agent-dev1", label: "D1", role: "Dev-1" },
-  { id: "agent-dev2", label: "D2", role: "Dev-2" },
-  { id: "agent-tester", label: "TE", role: "Tester" },
-  { id: "agent-devops", label: "DO", role: "DevOps" },
-];
+const STATUS_BAR_AGENTS = AGENT_REGISTRY.map((a) => ({
+  id: a.id,
+  label: a.shortLabel,
+  role: a.role,
+}));
 
 export class OfficeScene extends Container {
   private room: Room;
@@ -108,7 +106,7 @@ export class OfficeScene extends Container {
     agentList.forEach((agent, index) => {
       const pos = DESK_POSITIONS[index] ?? { x: 240, y: 160 };
 
-      const desk = new Desk(agent.name, AGENT_SEEDS[index]);
+      const desk = new Desk(agent.role, AGENT_SEEDS[index]);
       desk.x = pos.x;
       desk.y = pos.y;
       this.roomContainer.addChild(desk);
@@ -153,7 +151,7 @@ export class OfficeScene extends Container {
 
     const desk = this.desks.get(agent.id);
     if (desk) {
-      desk.setLabel(agent.name);
+      desk.setLabel(agent.role);
     }
 
     if (oldStatus === agent.status) return;

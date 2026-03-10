@@ -1,3 +1,4 @@
+import { ALL_AGENT_IDS } from "../shared/agentRegistry.js";
 import type { AgentStatus } from "../shared/types.js";
 import { addEvent, getAgent, upsertAgent } from "./state.js";
 import { broadcast } from "./websocket.js";
@@ -19,18 +20,18 @@ const DEMO_STEPS: DemoStep[] = [
   { delay: 6000, agentId: "agent-dev1", status: "coding", event: "Dev-1 is implementing the feature..." },
   { delay: 7000, agentId: "agent-architect", status: "coding", event: "Architect is writing design doc..." },
   { delay: 8000, agentId: "agent-dev2", status: "coding", event: "Dev-2 is building the API endpoint..." },
-  { delay: 10000, agentId: "agent-tester", status: "reviewing", event: "Tester is reviewing Dev-1's code..." },
+  { delay: 10000, agentId: "agent-reviewer", status: "reviewing", event: "Reviewer is reviewing Dev-1's code..." },
   {
     delay: 11000,
     agentId: "agent-dev1",
     status: "talking",
-    talkingTo: "agent-tester",
-    event: "Dev-1 discussing test results with Tester...",
+    talkingTo: "agent-reviewer",
+    event: "Dev-1 discussing review findings with Reviewer...",
   },
-  { delay: 12000, agentId: "agent-devops", status: "coding", event: "DevOps is updating the deployment config..." },
+  { delay: 12000, agentId: "agent-sceptic", status: "reviewing", event: "Sceptic is questioning the deployment strategy..." },
 ];
 
-const ALL_AGENT_IDS = ["agent-whip", "agent-architect", "agent-dev1", "agent-dev2", "agent-tester", "agent-devops"];
+export const DEMO_AGENT_IDS: string[] = [...new Set(DEMO_STEPS.map((s) => s.agentId))];
 
 function applyStep(step: DemoStep): void {
   const agent = getAgent(step.agentId);

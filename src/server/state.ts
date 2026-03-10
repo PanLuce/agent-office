@@ -2,6 +2,7 @@ import { randomUUID } from "node:crypto";
 import { mkdirSync } from "node:fs";
 import path from "node:path";
 import Database from "better-sqlite3";
+import { AGENT_REGISTRY } from "../shared/agentRegistry.js";
 import type { Agent, AgentEvent, Task } from "../shared/types.js";
 
 const DB_PATH = process.env.AGENT_OFFICE_DB_PATH || "./data/agent-office.db";
@@ -64,68 +65,16 @@ function pruneOldEvents(): void {
 
 pruneOldEvents();
 
-const DEFAULT_AGENTS: Agent[] = [
-  {
-    id: "agent-whip",
-    name: "Alice",
-    role: "Whip",
-    status: "idle",
-    currentTask: null,
-    talkingTo: null,
-    positionX: 90,
-    positionY: 104,
-  },
-  {
-    id: "agent-architect",
-    name: "Bob",
-    role: "Architect",
-    status: "idle",
-    currentTask: null,
-    talkingTo: null,
-    positionX: 240,
-    positionY: 99,
-  },
-  {
-    id: "agent-dev1",
-    name: "Carol",
-    role: "Dev-1",
-    status: "idle",
-    currentTask: null,
-    talkingTo: null,
-    positionX: 385,
-    positionY: 106,
-  },
-  {
-    id: "agent-dev2",
-    name: "Dave",
-    role: "Dev-2",
-    status: "idle",
-    currentTask: null,
-    talkingTo: null,
-    positionX: 95,
-    positionY: 219,
-  },
-  {
-    id: "agent-tester",
-    name: "Eve",
-    role: "Tester",
-    status: "idle",
-    currentTask: null,
-    talkingTo: null,
-    positionX: 238,
-    positionY: 224,
-  },
-  {
-    id: "agent-devops",
-    name: "Frank",
-    role: "DevOps",
-    status: "idle",
-    currentTask: null,
-    talkingTo: null,
-    positionX: 380,
-    positionY: 216,
-  },
-];
+const DEFAULT_AGENTS: Agent[] = AGENT_REGISTRY.map((def) => ({
+  id: def.id,
+  name: def.role,
+  role: def.role,
+  status: "idle" as const,
+  currentTask: null,
+  talkingTo: null,
+  positionX: def.defaultPosition.x,
+  positionY: def.defaultPosition.y,
+}));
 
 function seedAgents(): void {
   const count = db.prepare("SELECT COUNT(*) as cnt FROM agents").get() as { cnt: number };

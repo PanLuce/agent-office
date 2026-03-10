@@ -1,13 +1,7 @@
+import { AGENT_REGISTRY } from "../../shared/agentRegistry.js";
 import type { AgentEvent, Task, TaskStatus } from "../../shared/types.js";
 
-const ROLE_COLORS: Record<string, string> = {
-  Whip: "#e74c3c",
-  Architect: "#3498db",
-  "Dev-1": "#2ecc71",
-  "Dev-2": "#27ae60",
-  Tester: "#f39c12",
-  DevOps: "#9b59b6",
-};
+const ROLE_COLORS: Record<string, string> = Object.fromEntries(AGENT_REGISTRY.map((a) => [a.role, a.color]));
 
 const STATUS_DOT_COLORS: Record<TaskStatus, string> = {
   pending: "#888888",
@@ -196,7 +190,7 @@ export class SidePanel {
     const assignee = document.createElement("span");
     assignee.className = "task-assignee";
     if (task.assignedTo && this.agentNames[task.assignedTo]) {
-      assignee.textContent = this.agentNames[task.assignedTo].name;
+      assignee.textContent = this.agentNames[task.assignedTo].role;
     }
 
     item.append(dot, title, assignee);
@@ -214,7 +208,7 @@ export class SidePanel {
     const agent = document.createElement("span");
     agent.className = "log-agent";
     const info = this.agentNames[event.agentId];
-    agent.textContent = info?.name ?? event.agentId;
+    agent.textContent = info?.role ?? event.agentId;
     agent.style.color = info ? (ROLE_COLORS[info.role] ?? "#aaaacc") : "#aaaacc";
 
     const role = document.createElement("span");

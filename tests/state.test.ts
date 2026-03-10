@@ -20,7 +20,7 @@ describe("agent seeding", () => {
   it("should have Whip agent with correct data", () => {
     const whip = getAgent("agent-whip");
     expect(whip).toBeDefined();
-    expect(whip?.name).toBe("Alice");
+    expect(whip?.name).toBe("Whip");
     expect(whip?.role).toBe("Whip");
     expect(whip?.status).toBe("idle");
   });
@@ -69,7 +69,7 @@ describe("assignTask", () => {
 describe("completeTask", () => {
   it("should set status to done on success", () => {
     const task = createTask("Deploy app");
-    assignTask(task.id, "agent-devops");
+    assignTask(task.id, "agent-sceptic");
     completeTask(task.id, true);
 
     const tasks = getTasks();
