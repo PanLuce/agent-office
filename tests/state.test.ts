@@ -9,7 +9,10 @@ import {
   getAgents,
   getPendingTasks,
   getTasks,
+  syncAgentsWithRegistry,
+  upsertAgent,
 } from "../src/server/state.js";
+import { AGENT_REGISTRY } from "../src/shared/agentRegistry.js";
 
 describe("agent seeding", () => {
   it("should seed 6 agents", () => {
@@ -133,5 +136,50 @@ describe("clearTasks", () => {
 
     const tasks = getTasks();
     expect(tasks).toHaveLength(0);
+  });
+});
+
+describe("syncAgentsWithRegistry", () => {
+  it("should create missing agents from registry", () => {
+    syncAgentsWithRegistry();
+
+    for (const def of AGENT_REGISTRY) {
+      const agent = getAgent(def.id);
+      expect(agent, `Agent "${def.id}" should exist after sync`).toBeDefined();
+      expect(agent?.role).toBe(def.role);
+      expect(agent?.name).toBe(def.role);
+    }
+  });
+
+  it("should remove stale agents not in registry", () => {
+    // Arrange: insert a stale agent that is NOT in the registry
+    upsertAgent({
+      id: "agent-devops",
+      name: "DevOps",
+      role: "DevOps",
+      status: "idle",
+      currentTask: null,
+      talkingTo: null,
+      positionX: 100,
+      positionY: 100,
+    });
+    expect(getAgent("agent-devops")).toBeDefined();
+
+    // Act
+    syncAgentsWithRegistry();
+
+    // Assert: stale agent removed, registry agents still present
+    expect(getAgent("agent-devops")).toBeUndefined();
+    expect(getAgents()).toHaveLength(AGENT_REGISTRY.length);
+  });
+
+  it("should update existing agents with current registry data", () => {
+    syncAgentsWithRegistry();
+
+    for (const def of AGENT_REGISTRY) {
+      const agent = getAgent(def.id);
+      expect(agent?.positionX).toBe(def.defaultPosition.x);
+      expect(agent?.positionY).toBe(def.defaultPosition.y);
+    }
   });
 });

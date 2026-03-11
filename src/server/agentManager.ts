@@ -9,7 +9,7 @@ import type { AgentStatus } from "../shared/types.js";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-import { resolveAllowedTools } from "./agentConfig.js";
+import { resolveAllowedTools, resolveSystemPrompt } from "./agentConfig.js";
 import { assignTask, completeTask, createTask, getActiveTasks, getAgent } from "./state.js";
 
 export function mapToolToStatus(toolName: string): AgentStatus {
@@ -301,11 +301,14 @@ export class AgentManager {
     assignTask(taskId, agentId);
     this.callbacks.onTaskChange?.();
 
-    const prompt = `You are the ${role} specialist. Complete this task in the project at ${this.workingDirectory}: ${taskDescription}\n\nWork independently. Be thorough but concise. When done, summarize what you did.`;
+    const tools = resolveAllowedTools(agentId, role);
+    const systemPrompt = resolveSystemPrompt(agentId, role);
+    const prompt = systemPrompt
+      ? `Complete this task in the project at ${this.workingDirectory}: ${taskDescription}\n\nWork independently. Be thorough but concise. When done, summarize what you did.`
+      : `You are the ${role} specialist. Complete this task in the project at ${this.workingDirectory}: ${taskDescription}\n\nWork independently. Be thorough but concise. When done, summarize what you did.`;
 
     try {
-      const tools = resolveAllowedTools(agentId, role);
-      await this.runClaude(agentId, prompt, undefined, tools);
+      await this.runClaude(agentId, prompt, systemPrompt, tools);
       completeTask(taskId, true);
       this.callbacks.onTaskChange?.();
       this.callbacks.onStatusChange(agentId, "idle");

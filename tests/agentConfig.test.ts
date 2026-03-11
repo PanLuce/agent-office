@@ -2,7 +2,7 @@ import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { loadAgentConfig, resolveAllowedTools } from "../src/server/agentConfig.js";
+import { loadAgentConfig, resolveAllowedTools, resolveSystemPrompt } from "../src/server/agentConfig.js";
 import { AGENT_REGISTRY } from "../src/shared/agentRegistry.js";
 
 describe("loadAgentConfig", () => {
@@ -45,6 +45,15 @@ describe("loadAgentConfig", () => {
     const result = loadAgentConfig("agent-dev1", configDir);
 
     expect(result.allowedTools).toBeUndefined();
+  });
+
+  it("should load systemPrompt from config file", () => {
+    const config = { allowedTools: ["Read"], systemPrompt: "You are the Sceptic." };
+    writeFileSync(path.join(configDir, "sceptic.json"), JSON.stringify(config));
+
+    const result = loadAgentConfig("agent-sceptic", configDir);
+
+    expect(result.systemPrompt).toBe("You are the Sceptic.");
   });
 
   it("should map each agent ID to the correct config filename", () => {
@@ -96,5 +105,41 @@ describe("resolveAllowedTools", () => {
     const tools = resolveAllowedTools("agent-unknown", "Unknown", configDir);
 
     expect(tools).toEqual(["Read", "Glob", "Grep"]);
+  });
+});
+
+describe("resolveSystemPrompt", () => {
+  let configDir: string;
+
+  beforeEach(() => {
+    configDir = mkdtempSync(path.join(tmpdir(), "agent-config-test-"));
+  });
+
+  afterEach(() => {
+    rmSync(configDir, { recursive: true, force: true });
+  });
+
+  it("should return systemPrompt from config when present", () => {
+    const config = { allowedTools: ["Read"], systemPrompt: "You question everything." };
+    writeFileSync(path.join(configDir, "sceptic.json"), JSON.stringify(config));
+
+    const result = resolveSystemPrompt("agent-sceptic", "Sceptic", configDir);
+
+    expect(result).toBe("You question everything.");
+  });
+
+  it("should return undefined when config has no systemPrompt", () => {
+    const config = { allowedTools: ["Read"] };
+    writeFileSync(path.join(configDir, "sceptic.json"), JSON.stringify(config));
+
+    const result = resolveSystemPrompt("agent-sceptic", "Sceptic", configDir);
+
+    expect(result).toBeUndefined();
+  });
+
+  it("should return undefined when no config file exists", () => {
+    const result = resolveSystemPrompt("agent-sceptic", "Sceptic", configDir);
+
+    expect(result).toBeUndefined();
   });
 });

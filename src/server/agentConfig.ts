@@ -11,6 +11,7 @@ const DEFAULT_CONFIG_DIR = path.resolve(__dirname, "../../../config/agents");
 
 export interface AgentConfig {
   allowedTools?: string[];
+  systemPrompt?: string;
 }
 
 export function loadAgentConfig(agentId: string, configDir = DEFAULT_CONFIG_DIR): AgentConfig {
@@ -32,4 +33,9 @@ export function resolveAllowedTools(agentId: string, role: string, configDir = D
     return config.allowedTools;
   }
   return getToolsForRole(role);
+}
+
+export function resolveSystemPrompt(agentId: string, role: string, configDir = DEFAULT_CONFIG_DIR): string | undefined {
+  const config = loadAgentConfig(agentId, configDir);
+  return config.systemPrompt;
 }

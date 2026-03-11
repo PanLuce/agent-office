@@ -65,7 +65,7 @@ function pruneOldEvents(): void {
 
 pruneOldEvents();
 
-const DEFAULT_AGENTS: Agent[] = AGENT_REGISTRY.map((def) => ({
+export const DEFAULT_AGENTS: Agent[] = AGENT_REGISTRY.map((def) => ({
   id: def.id,
   name: def.role,
   role: def.role,
@@ -76,25 +76,41 @@ const DEFAULT_AGENTS: Agent[] = AGENT_REGISTRY.map((def) => ({
   positionY: def.defaultPosition.y,
 }));
 
-function seedAgents(): void {
-  const count = db.prepare("SELECT COUNT(*) as cnt FROM agents").get() as { cnt: number };
-  if (count.cnt > 0) return;
+export function syncAgentsWithRegistry(): void {
+  const registryIds = new Set(AGENT_REGISTRY.map((a) => a.id));
+  const now = Date.now();
 
-  const insert = db.prepare(`
+  const upsertStmt = db.prepare(`
     INSERT INTO agents (id, name, role, status, current_task, talking_to, position_x, position_y, updated_at)
-    VALUES (@id, @name, @role, @status, @currentTask, @talkingTo, @positionX, @positionY, @updatedAt)
+    VALUES (@id, @name, @role, 'idle', NULL, NULL, @positionX, @positionY, @updatedAt)
+    ON CONFLICT(id) DO UPDATE SET
+      name = @name, role = @role, position_x = @positionX, position_y = @positionY, updated_at = @updatedAt
   `);
 
-  const now = Date.now();
-  const seedAll = db.transaction(() => {
-    for (const agent of DEFAULT_AGENTS) {
-      insert.run({ ...agent, updatedAt: now });
+  const syncAll = db.transaction(() => {
+    for (const def of AGENT_REGISTRY) {
+      upsertStmt.run({
+        id: def.id,
+        name: def.role,
+        role: def.role,
+        positionX: def.defaultPosition.x,
+        positionY: def.defaultPosition.y,
+        updatedAt: now,
+      });
+    }
+
+    const dbAgents = db.prepare("SELECT id FROM agents").all() as { id: string }[];
+    for (const row of dbAgents) {
+      if (!registryIds.has(row.id)) {
+        db.prepare("DELETE FROM agents WHERE id = ?").run(row.id);
+      }
     }
   });
-  seedAll();
+
+  syncAll();
 }
 
-seedAgents();
+syncAgentsWithRegistry();
 
 interface AgentRow {
   id: string;

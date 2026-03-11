@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
+import { DEMO_AGENT_IDS } from "../src/server/demo.js";
 import {
   AGENT_BY_ID,
   AGENT_BY_ROLE,
@@ -6,7 +7,6 @@ import {
   ALL_AGENT_IDS,
   buildTeamDescription,
 } from "../src/shared/agentRegistry.js";
-import { DEMO_AGENT_IDS } from "../src/server/demo.js";
 
 vi.mock("pixi.js", () => ({
   Container: class {},
@@ -126,5 +126,12 @@ describe("Agent registry propagation", () => {
     for (const id of DEMO_AGENT_IDS) {
       expect(ALL_AGENT_IDS, `Invalid DEMO_STEPS agentId "${id}"`).toContain(id);
     }
+  });
+
+  it("DEFAULT_AGENTS IDs should match ALL_AGENT_IDS", async () => {
+    const { DEFAULT_AGENTS } = await import("../src/server/state.js");
+    const defaultIds = DEFAULT_AGENTS.map((a: { id: string }) => a.id).sort();
+    const registryIds = [...ALL_AGENT_IDS].sort();
+    expect(defaultIds).toEqual(registryIds);
   });
 });
