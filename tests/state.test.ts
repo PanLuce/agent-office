@@ -15,9 +15,9 @@ import {
 import { AGENT_REGISTRY } from "../src/shared/agentRegistry.js";
 
 describe("agent seeding", () => {
-  it("should seed 6 agents", () => {
+  it("should seed 5 agents", () => {
     const agents = getAgents();
-    expect(agents).toHaveLength(6);
+    expect(agents).toHaveLength(5);
   });
 
   it("should have Whip agent with correct data", () => {
@@ -40,9 +40,9 @@ describe("createTask", () => {
   });
 
   it("should create a task with assignee", () => {
-    const task = createTask("Design API", "agent-architect");
+    const task = createTask("Design API", "agent-devka");
 
-    expect(task.assignedTo).toBe("agent-architect");
+    expect(task.assignedTo).toBe("agent-devka");
     expect(task.status).toBe("pending");
   });
 
@@ -59,12 +59,12 @@ describe("createTask", () => {
 describe("assignTask", () => {
   it("should set assignee and status to in_progress", () => {
     const task = createTask("Implement feature");
-    assignTask(task.id, "agent-dev1");
+    assignTask(task.id, "agent-devka");
 
     const tasks = getTasks();
     const updated = tasks.find((t) => t.id === task.id);
 
-    expect(updated?.assignedTo).toBe("agent-dev1");
+    expect(updated?.assignedTo).toBe("agent-devka");
     expect(updated?.status).toBe("in_progress");
   });
 });
@@ -83,7 +83,7 @@ describe("completeTask", () => {
 
   it("should set status to failed on failure", () => {
     const task = createTask("Broken task");
-    assignTask(task.id, "agent-dev2");
+    assignTask(task.id, "agent-druha-devka");
     completeTask(task.id, false);
 
     const tasks = getTasks();
@@ -98,10 +98,10 @@ describe("getActiveTasks", () => {
     clearTasks();
 
     const t1 = createTask("Active 1");
-    assignTask(t1.id, "agent-dev1");
+    assignTask(t1.id, "agent-devka");
     const t2 = createTask("Pending 1");
     const t3 = createTask("Done 1");
-    assignTask(t3.id, "agent-dev2");
+    assignTask(t3.id, "agent-druha-devka");
     completeTask(t3.id, true);
 
     const active = getActiveTasks();
@@ -119,7 +119,7 @@ describe("getPendingTasks", () => {
 
     const t1 = createTask("Pending");
     const t2 = createTask("In progress");
-    assignTask(t2.id, "agent-dev1");
+    assignTask(t2.id, "agent-devka");
 
     const pending = getPendingTasks();
     const pendingIds = pending.map((t) => t.id);

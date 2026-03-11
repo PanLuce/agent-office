@@ -22,14 +22,7 @@ const HAIR_STYLES: Record<string, { color: number; draw: (g: Graphics, x: number
       g.fill(0x4a2a1a);
     },
   },
-  Architect: {
-    color: 0x1a1a2a,
-    draw: (g, x, y) => {
-      g.rect(x - 3, y - 2, 6, 2);
-      g.fill(0x1a1a2a);
-    },
-  },
-  "Dev-1": {
+  devka: {
     color: 0x8a3a1a,
     draw: (g, x, y) => {
       g.rect(x - 3, y - 2, 6, 2);
@@ -42,7 +35,7 @@ const HAIR_STYLES: Record<string, { color: number; draw: (g: Graphics, x: number
       g.fill(0x8a3a1a);
     },
   },
-  "Dev-2": {
+  "druhá devka": {
     color: 0x2a2a2a,
     draw: (g, x, y) => {
       g.rect(x - 3, y - 2, 6, 2);
@@ -193,15 +186,6 @@ export class AgentSprite extends Container {
       g.fill(0xd4c090);
       g.rect(7, -3, 3, 1);
       g.fill(0xb0a070);
-      this.addChild(g);
-    }
-
-    if (role === "Architect") {
-      const g = new Graphics();
-      g.rect(-3, -9, 2, 2);
-      g.fill({ color: 0xaaccee, alpha: 0.6 });
-      g.rect(1, -9, 2, 2);
-      g.fill({ color: 0xaaccee, alpha: 0.6 });
       this.addChild(g);
     }
   }

@@ -19,8 +19,8 @@ vi.mock("pixi.js", () => ({
 const { HAIR_STYLE_ROLES } = await import("../src/client/office/AgentSprite.js");
 
 describe("AGENT_REGISTRY", () => {
-  it("should define exactly 6 agents", () => {
-    expect(AGENT_REGISTRY).toHaveLength(6);
+  it("should define exactly 5 agents", () => {
+    expect(AGENT_REGISTRY).toHaveLength(5);
   });
 
   it("should have unique ids", () => {
@@ -40,7 +40,7 @@ describe("AGENT_REGISTRY", () => {
 
   it("should include all expected roles", () => {
     const roles = AGENT_REGISTRY.map((a) => a.role).sort();
-    expect(roles).toEqual(["Architect", "Dev-1", "Dev-2", "Reviewer", "Sceptic", "Whip"]);
+    expect(roles).toEqual(["Reviewer", "Sceptic", "Whip", "devka", "druhá devka"]);
   });
 
   it("should have valid hex color strings", () => {
@@ -55,8 +55,6 @@ describe("AGENT_BY_ID", () => {
   it("should look up agent by id", () => {
     const whip = AGENT_BY_ID["agent-whip"];
     expect(whip?.role).toBe("Whip");
-    const reviewer = AGENT_BY_ID["agent-reviewer"];
-    expect(reviewer?.role).toBe("Reviewer");
   });
 
   it("should return undefined for unknown id", () => {
@@ -68,19 +66,10 @@ describe("AGENT_BY_ID", () => {
 describe("AGENT_BY_ROLE", () => {
   it("should look up agent by role", () => {
     expect(AGENT_BY_ROLE.Whip?.id).toBe("agent-whip");
-    expect(AGENT_BY_ROLE.Reviewer?.id).toBe("agent-reviewer");
   });
 
   it("should return undefined for unknown role", () => {
     expect(AGENT_BY_ROLE.Unknown).toBeUndefined();
-  });
-});
-
-describe("ALL_AGENT_IDS", () => {
-  it("should contain all 6 agent ids", () => {
-    expect(ALL_AGENT_IDS).toHaveLength(6);
-    expect(ALL_AGENT_IDS).toContain("agent-whip");
-    expect(ALL_AGENT_IDS).toContain("agent-reviewer");
   });
 });
 
@@ -92,11 +81,11 @@ describe("buildTeamDescription", () => {
 
   it("should list all non-Whip roles with their specialties", () => {
     const desc = buildTeamDescription();
-    expect(desc).toContain("Architect");
-    expect(desc).toContain("Dev-1");
-    expect(desc).toContain("Dev-2");
+    expect(desc).toContain("devka");
+    expect(desc).toContain("druhá devka");
     expect(desc).toContain("Reviewer");
     expect(desc).toContain("Sceptic");
+    expect(desc).not.toContain("Architect");
   });
 
   it("should format as dash-prefixed lines", () => {

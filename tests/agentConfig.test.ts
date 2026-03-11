@@ -18,31 +18,31 @@ describe("loadAgentConfig", () => {
 
   it("should load allowedTools from a valid config file", () => {
     const config = { allowedTools: ["Read", "Write", "Bash"] };
-    writeFileSync(path.join(configDir, "dev-1.json"), JSON.stringify(config));
+    writeFileSync(path.join(configDir, "devka.json"), JSON.stringify(config));
 
-    const result = loadAgentConfig("agent-dev1", configDir);
+    const result = loadAgentConfig("agent-devka", configDir);
 
     expect(result.allowedTools).toEqual(["Read", "Write", "Bash"]);
   });
 
   it("should return empty config when file does not exist", () => {
-    const result = loadAgentConfig("agent-dev1", configDir);
+    const result = loadAgentConfig("agent-devka", configDir);
 
     expect(result).toEqual({});
   });
 
   it("should return empty config when file contains invalid JSON", () => {
-    writeFileSync(path.join(configDir, "dev-1.json"), "not json {{{");
+    writeFileSync(path.join(configDir, "devka.json"), "not json {{{");
 
-    const result = loadAgentConfig("agent-dev1", configDir);
+    const result = loadAgentConfig("agent-devka", configDir);
 
     expect(result).toEqual({});
   });
 
   it("should return config without allowedTools when key is missing", () => {
-    writeFileSync(path.join(configDir, "dev-1.json"), JSON.stringify({ other: "value" }));
+    writeFileSync(path.join(configDir, "devka.json"), JSON.stringify({ other: "value" }));
 
-    const result = loadAgentConfig("agent-dev1", configDir);
+    const result = loadAgentConfig("agent-devka", configDir);
 
     expect(result.allowedTools).toBeUndefined();
   });
@@ -80,23 +80,23 @@ describe("resolveAllowedTools", () => {
 
   it("should use config file tools when present", () => {
     const config = { allowedTools: ["Read", "Bash"] };
-    writeFileSync(path.join(configDir, "dev-1.json"), JSON.stringify(config));
+    writeFileSync(path.join(configDir, "devka.json"), JSON.stringify(config));
 
-    const tools = resolveAllowedTools("agent-dev1", "Dev-1", configDir);
+    const tools = resolveAllowedTools("agent-devka", "devka", configDir);
 
     expect(tools).toEqual(["Read", "Bash"]);
   });
 
   it("should fall back to role defaults when no config file exists", () => {
-    const tools = resolveAllowedTools("agent-dev1", "Dev-1", configDir);
+    const tools = resolveAllowedTools("agent-devka", "devka", configDir);
 
     expect(tools).toEqual(["Read", "Write", "Edit", "MultiEdit", "Bash", "Glob", "Grep"]);
   });
 
   it("should fall back to role defaults when config has no allowedTools", () => {
-    writeFileSync(path.join(configDir, "dev-1.json"), JSON.stringify({ other: true }));
+    writeFileSync(path.join(configDir, "devka.json"), JSON.stringify({ other: true }));
 
-    const tools = resolveAllowedTools("agent-dev1", "Dev-1", configDir);
+    const tools = resolveAllowedTools("agent-devka", "devka", configDir);
 
     expect(tools).toEqual(["Read", "Write", "Edit", "MultiEdit", "Bash", "Glob", "Grep"]);
   });

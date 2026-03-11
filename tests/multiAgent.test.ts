@@ -32,10 +32,10 @@ describe("task lifecycle via state", () => {
   it("should create, assign, and complete tasks", () => {
     clearTasks();
 
-    const task = createTask("Test multi-agent task", "agent-dev1");
+    const task = createTask("Test multi-agent task", "agent-devka");
     expect(task.status).toBe("pending");
 
-    assignTask(task.id, "agent-dev1");
+    assignTask(task.id, "agent-devka");
     const active = getActiveTasks();
     expect(active.some((t) => t.id === task.id)).toBe(true);
 

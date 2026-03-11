@@ -12,7 +12,7 @@ describe("SidePanel log entries", () => {
     panel = new SidePanel(container);
     panel.setAgentNames([
       { id: "agent-whip", name: "Alice", role: "Whip" },
-      { id: "agent-architect", name: "Bob", role: "Architect" },
+      { id: "agent-devka", name: "Bob", role: "devka" },
     ]);
   });
 
@@ -46,11 +46,11 @@ describe("SidePanel log entries", () => {
   });
 
   it("should show correct role for different agents", () => {
-    panel.addEvent(makeEvent({ agentId: "agent-architect" }));
+    panel.addEvent(makeEvent({ agentId: "agent-devka" }));
 
     const entry = getFirstLogEntry();
     const roleSpan = entry?.querySelector(".log-role");
-    expect(roleSpan?.textContent).toBe("[Architect]");
+    expect(roleSpan?.textContent).toBe("[devka]");
   });
 
   it("should show empty role when agent is unknown", () => {

@@ -22,7 +22,7 @@ describe("GET /api/health", () => {
     expect(res.status).toBe(200);
     expect(body.status).toBe("ok");
     expect(body.uptime).toBeGreaterThanOrEqual(0);
-    expect(body.agents).toBe(6);
+    expect(body.agents).toBe(5);
     expect(typeof body.activeTasks).toBe("number");
   });
 });
@@ -38,7 +38,7 @@ describe("GET /api/status", () => {
     expect(typeof body.activeTasks).toBe("number");
     expect(typeof body.completedTasks).toBe("number");
     expect(typeof body.failedTasks).toBe("number");
-    expect(body.agents).toHaveLength(6);
+    expect(body.agents).toHaveLength(5);
   });
 
   it("should include agent details in status", async () => {
@@ -120,7 +120,7 @@ describe("GET /api/demo", () => {
     const body = await res.json();
 
     expect(body.started).toBe(true);
-    expect(body.duration).toBe("14 seconds");
+    expect(body.duration).toBe("12 seconds");
   });
 
   it("should reject concurrent demo runs", async () => {

@@ -67,11 +67,11 @@ describe("WebSocket connection", () => {
     expect(message.timestamp).toBeGreaterThan(0);
   });
 
-  it("should include 6 agents in full_state", async () => {
+  it("should include 5 agents in full_state", async () => {
     const message = await connectAndReceive(wsUrl);
     const payload = message.payload as FullStatePayload;
 
-    expect(payload.agents).toHaveLength(6);
+    expect(payload.agents).toHaveLength(5);
     expect(payload.tasks).toBeInstanceOf(Array);
     expect(payload.events).toBeInstanceOf(Array);
   });
@@ -81,7 +81,7 @@ describe("WebSocket connection", () => {
     const payload = message.payload as FullStatePayload;
     const roles = payload.agents.map((a) => a.role).sort();
 
-    expect(roles).toEqual(["Architect", "Dev-1", "Dev-2", "Reviewer", "Sceptic", "Whip"]);
+    expect(roles).toEqual(["Reviewer", "Sceptic", "Whip", "devka", "druhá devka"]);
   });
 
   it("should have all agents in idle status initially", async () => {

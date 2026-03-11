@@ -16,19 +16,22 @@ interface DemoStep {
 const DEMO_STEPS: DemoStep[] = [
   { delay: 0, agentId: "agent-whip", status: "thinking", event: "Whip is analyzing the request..." },
   { delay: 2000, agentId: "agent-whip", status: "talking", event: "Whip is briefing the team..." },
-  { delay: 4000, agentId: "agent-architect", status: "thinking", event: "Architect is designing the approach..." },
-  { delay: 6000, agentId: "agent-dev1", status: "coding", event: "Dev-1 is implementing the feature..." },
-  { delay: 7000, agentId: "agent-architect", status: "coding", event: "Architect is writing design doc..." },
-  { delay: 8000, agentId: "agent-dev2", status: "coding", event: "Dev-2 is building the API endpoint..." },
-  { delay: 10000, agentId: "agent-reviewer", status: "reviewing", event: "Reviewer is reviewing Dev-1's code..." },
+  { delay: 4000, agentId: "agent-devka", status: "coding", event: "devka is implementing the feature..." },
+  { delay: 6000, agentId: "agent-druha-devka", status: "coding", event: "druhá devka is building the API endpoint..." },
+  { delay: 8000, agentId: "agent-reviewer", status: "reviewing", event: "Reviewer is reviewing devka's code..." },
   {
-    delay: 11000,
-    agentId: "agent-dev1",
+    delay: 9000,
+    agentId: "agent-devka",
     status: "talking",
     talkingTo: "agent-reviewer",
-    event: "Dev-1 discussing review findings with Reviewer...",
+    event: "devka discussing review findings with Reviewer...",
   },
-  { delay: 12000, agentId: "agent-sceptic", status: "reviewing", event: "Sceptic is questioning the deployment strategy..." },
+  {
+    delay: 10000,
+    agentId: "agent-sceptic",
+    status: "reviewing",
+    event: "Sceptic is questioning the deployment strategy...",
+  },
 ];
 
 export const DEMO_AGENT_IDS: string[] = [...new Set(DEMO_STEPS.map((s) => s.agentId))];
@@ -79,9 +82,9 @@ export function runDemo(): { started: boolean; error?: string; duration?: string
     setTimeout(() => applyStep(step), step.delay);
   }
 
-  setTimeout(resetAllAgents, 14000);
+  setTimeout(resetAllAgents, 12000);
 
-  return { started: true, duration: "14 seconds" };
+  return { started: true, duration: "12 seconds" };
 }
 
 export function isDemoRunning(): boolean {

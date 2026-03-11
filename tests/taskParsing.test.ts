@@ -5,26 +5,26 @@ describe("parseTaskAssignments", () => {
   it("should parse single task block", () => {
     const text = `Let me analyze this and delegate.
 \`\`\`task
-{"assign": "Dev-1", "task": "Build the login form component"}
+{"assign": "devka", "task": "Build the login form component"}
 \`\`\``;
 
     const tasks = parseTaskAssignments(text);
 
     expect(tasks).toHaveLength(1);
-    expect(tasks[0].assign).toBe("Dev-1");
+    expect(tasks[0].assign).toBe("devka");
     expect(tasks[0].task).toBe("Build the login form component");
   });
 
   it("should parse multiple task blocks", () => {
     const text = `Breaking this into subtasks:
 \`\`\`task
-{"assign": "Architect", "task": "Design the API schema"}
+{"assign": "devka", "task": "Build the frontend"}
 \`\`\`
 \`\`\`task
-{"assign": "Dev-1", "task": "Build the frontend"}
+{"assign": "druhá devka", "task": "Build the backend"}
 \`\`\`
 \`\`\`task
-{"assign": "Dev-2", "task": "Build the backend"}
+{"assign": "Reviewer", "task": "Review the code"}
 \`\`\`
 \`\`\`task
 {"assign": "self", "task": "Coordinate and review"}
@@ -33,7 +33,7 @@ describe("parseTaskAssignments", () => {
     const tasks = parseTaskAssignments(text);
 
     expect(tasks).toHaveLength(4);
-    expect(tasks[0].assign).toBe("Architect");
+    expect(tasks[0].assign).toBe("devka");
     expect(tasks[3].assign).toBe("self");
   });
 
@@ -43,13 +43,13 @@ describe("parseTaskAssignments", () => {
 not valid json
 \`\`\`
 \`\`\`task
-{"assign": "Dev-1", "task": "Valid task"}
+{"assign": "devka", "task": "Valid task"}
 \`\`\``;
 
     const tasks = parseTaskAssignments(text);
 
     expect(tasks).toHaveLength(1);
-    expect(tasks[0].assign).toBe("Dev-1");
+    expect(tasks[0].assign).toBe("devka");
   });
 
   it("should return empty array when no task blocks", () => {
@@ -72,16 +72,12 @@ not valid json
 });
 
 describe("resolveAgentId", () => {
-  it("should resolve Dev-1 to agent-dev1", () => {
-    expect(resolveAgentId("Dev-1")).toBe("agent-dev1");
+  it("should resolve devka to agent-devka", () => {
+    expect(resolveAgentId("devka")).toBe("agent-devka");
   });
 
-  it("should resolve Dev-2 to agent-dev2", () => {
-    expect(resolveAgentId("Dev-2")).toBe("agent-dev2");
-  });
-
-  it("should resolve Architect to agent-architect", () => {
-    expect(resolveAgentId("Architect")).toBe("agent-architect");
+  it("should resolve druhá devka to agent-druha-devka", () => {
+    expect(resolveAgentId("druhá devka")).toBe("agent-druha-devka");
   });
 
   it("should resolve Reviewer to agent-reviewer", () => {
@@ -102,17 +98,18 @@ describe("resolveAgentId", () => {
 });
 
 describe("getToolsForRole", () => {
-  it("should give Architect read-focused tools", () => {
-    const tools = getToolsForRole("Architect");
+  it("should give devka full coding tools", () => {
+    const tools = getToolsForRole("devka");
 
     expect(tools).toContain("Read");
     expect(tools).toContain("Write");
-    expect(tools).toContain("Glob");
-    expect(tools).toContain("Grep");
+    expect(tools).toContain("Edit");
+    expect(tools).toContain("MultiEdit");
+    expect(tools).toContain("Bash");
   });
 
-  it("should give Dev-1 full coding tools", () => {
-    const tools = getToolsForRole("Dev-1");
+  it("should give druhá devka full coding tools", () => {
+    const tools = getToolsForRole("druhá devka");
 
     expect(tools).toContain("Read");
     expect(tools).toContain("Write");
