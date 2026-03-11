@@ -49,6 +49,21 @@ describe("AGENT_REGISTRY", () => {
       expect(agent.shirtColor).toMatch(/^#[0-9a-fA-F]{6}$/);
     }
   });
+
+  it("should not contain placeholder or generic roles", () => {
+    const placeholderPattern = /^(dev|agent|test)-\d+$/i;
+    for (const agent of AGENT_REGISTRY) {
+      expect(agent.role, `Placeholder role "${agent.role}"`).not.toMatch(placeholderPattern);
+    }
+  });
+
+  it("should not contain placeholder or generic ids or shortLabels", () => {
+    const placeholderPattern = /^(dev|agent|test)-\d+$/i;
+    for (const agent of AGENT_REGISTRY) {
+      expect(agent.id, `Placeholder id "${agent.id}"`).not.toMatch(placeholderPattern);
+      expect(agent.shortLabel, `Placeholder shortLabel "${agent.shortLabel}"`).not.toMatch(placeholderPattern);
+    }
+  });
 });
 
 describe("AGENT_BY_ID", () => {
@@ -122,5 +137,19 @@ describe("Agent registry propagation", () => {
     const defaultIds = DEFAULT_AGENTS.map((a: { id: string }) => a.id).sort();
     const registryIds = [...ALL_AGENT_IDS].sort();
     expect(defaultIds).toEqual(registryIds);
+  });
+
+  it("DEFAULT_AGENTS name should equal role for every agent", async () => {
+    const { DEFAULT_AGENTS } = await import("../src/server/state.js");
+    for (const agent of DEFAULT_AGENTS as { name: string; role: string }[]) {
+      expect(agent.name, `Agent name "${agent.name}" !== role "${agent.role}"`).toBe(agent.role);
+    }
+  });
+
+  it("DEFAULT_AGENTS roles should all exist in AGENT_REGISTRY", async () => {
+    const { DEFAULT_AGENTS } = await import("../src/server/state.js");
+    for (const agent of DEFAULT_AGENTS as { role: string }[]) {
+      expect(registryRoles, `DEFAULT_AGENTS role "${agent.role}" not in registry`).toContain(agent.role);
+    }
   });
 });

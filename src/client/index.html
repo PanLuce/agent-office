@@ -41,6 +41,10 @@
     }
 
     .panel-section { display: flex; flex-direction: column; overflow: hidden; }
+
+    .panel-section-body {
+      flex: 1; overflow-y: auto; padding: 6px 10px;
+    }
     .panel-section.collapsed .panel-section-body { display: none; }
 
     .panel-section-header {
@@ -55,10 +59,6 @@
       font-size: 9px; transition: transform 0.15s;
     }
     .panel-section.collapsed .chevron { transform: rotate(-90deg); }
-
-    .panel-section-body {
-      flex: 1; overflow-y: auto; padding: 6px 10px;
-    }
     .panel-section-body::-webkit-scrollbar { width: 5px; }
     .panel-section-body::-webkit-scrollbar-track { background: transparent; }
     .panel-section-body::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
@@ -127,7 +127,7 @@
     <div id="command-bar">
       <span id="prompt-indicator">&#9654;</span>
       <input id="command-input" type="text" placeholder="Enter project path to connect (e.g., /Users/you/project)..." />
-      <button id="abort-btn" style="display:none; background:#e74c3c; color:#fff; border:none; padding:4px 10px; margin-left:8px; font-family:inherit; font-size:12px; cursor:pointer; border-radius:3px;">&#10005; Abort</button>
+      <button type="button" id="abort-btn" style="display:none; background:#e74c3c; color:#fff; border:none; padding:4px 10px; margin-left:8px; font-family:inherit; font-size:12px; cursor:pointer; border-radius:3px;">&#10005; Abort</button>
     </div>
   </div>
   <script type="module" src="bundle.js"></script>

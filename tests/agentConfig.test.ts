@@ -123,7 +123,7 @@ describe("resolveSystemPrompt", () => {
     const config = { allowedTools: ["Read"], systemPrompt: "You question everything." };
     writeFileSync(path.join(configDir, "sceptic.json"), JSON.stringify(config));
 
-    const result = resolveSystemPrompt("agent-sceptic", "Sceptic", configDir);
+    const result = resolveSystemPrompt("agent-sceptic", configDir);
 
     expect(result).toBe("You question everything.");
   });
@@ -132,13 +132,13 @@ describe("resolveSystemPrompt", () => {
     const config = { allowedTools: ["Read"] };
     writeFileSync(path.join(configDir, "sceptic.json"), JSON.stringify(config));
 
-    const result = resolveSystemPrompt("agent-sceptic", "Sceptic", configDir);
+    const result = resolveSystemPrompt("agent-sceptic", configDir);
 
     expect(result).toBeUndefined();
   });
 
   it("should return undefined when no config file exists", () => {
-    const result = resolveSystemPrompt("agent-sceptic", "Sceptic", configDir);
+    const result = resolveSystemPrompt("agent-sceptic", configDir);
 
     expect(result).toBeUndefined();
   });
@@ -147,7 +147,7 @@ describe("resolveSystemPrompt", () => {
     const config = { systemPrompt: "Your team:\n{{team}}\n\nDelegate work." };
     writeFileSync(path.join(configDir, "whip.json"), JSON.stringify(config));
 
-    const result = resolveSystemPrompt("agent-whip", "Whip", configDir);
+    const result = resolveSystemPrompt("agent-whip", configDir);
 
     expect(result).toContain(buildTeamDescription());
     expect(result).not.toContain("{{team}}");

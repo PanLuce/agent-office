@@ -35,7 +35,7 @@ export function resolveAllowedTools(agentId: string, role: string, configDir = D
   return getToolsForRole(role);
 }
 
-export function resolveSystemPrompt(agentId: string, role: string, configDir = DEFAULT_CONFIG_DIR): string | undefined {
+export function resolveSystemPrompt(agentId: string, configDir = DEFAULT_CONFIG_DIR): string | undefined {
   const config = loadAgentConfig(agentId, configDir);
   if (!config.systemPrompt) return undefined;
   return config.systemPrompt.replace("{{team}}", buildTeamDescription());

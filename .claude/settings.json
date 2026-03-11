@@ -17,6 +17,10 @@
           {
             "type": "command",
             "command": ".claude/hooks/on-stop.sh"
+          },
+          {
+            "type": "command",
+            "command": "Run the tests by command npm run test and lint by command npm run lint-fix"
           }
         ]
       }

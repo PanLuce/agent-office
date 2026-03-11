@@ -194,8 +194,9 @@ function resizeCanvas(): void {
 }
 
 function initSplitter(canvasContainer: HTMLElement): void {
-  const splitter = document.getElementById("splitter")!;
-  const mainArea = document.getElementById("main-area")!;
+  const splitter = document.getElementById("splitter");
+  const mainArea = document.getElementById("main-area");
+  if (!splitter || !mainArea) return;
 
   let dragging = false;
 
@@ -228,7 +229,8 @@ function initSplitter(canvasContainer: HTMLElement): void {
 }
 
 async function initApp(): Promise<void> {
-  const canvasContainer = document.getElementById("canvas-container")!;
+  const canvasContainer = document.getElementById("canvas-container");
+  if (!canvasContainer) throw new Error("Missing #canvas-container element");
 
   app = new Application();
   await app.init({
@@ -250,7 +252,8 @@ async function initApp(): Promise<void> {
   statusText.y = 12;
   app.stage.addChild(statusText);
 
-  const sidePanelEl = document.getElementById("side-panel")!;
+  const sidePanelEl = document.getElementById("side-panel");
+  if (!sidePanelEl) throw new Error("Missing #side-panel element");
   sidePanel = new SidePanel(sidePanelEl);
 
   commandBar = new CommandBar(sendWsMessage, (text) => {

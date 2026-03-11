@@ -52,9 +52,9 @@ export interface ParsedTaskAssignment {
 export function parseTaskAssignments(text: string): ParsedTaskAssignment[] {
   const results: ParsedTaskAssignment[] = [];
   const regex = /```task\s*\n([\s\S]*?)```/g;
-  let match: RegExpExecArray | null;
+  let match: RegExpExecArray | null = regex.exec(text);
 
-  while ((match = regex.exec(text)) !== null) {
+  while (match !== null) {
     try {
       const parsed = JSON.parse(match[1].trim());
       if (parsed.assign && parsed.task) {
@@ -63,6 +63,7 @@ export function parseTaskAssignments(text: string): ParsedTaskAssignment[] {
     } catch {
       console.warn("[parseTaskAssignments] Skipping malformed task block");
     }
+    match = regex.exec(text);
   }
 
   return results;
@@ -198,7 +199,7 @@ export class AgentManager {
 
     try {
       const whipTools = resolveAllowedTools(agentId, "Whip");
-      const whipSystemPrompt = resolveSystemPrompt(agentId, "Whip");
+      const whipSystemPrompt = resolveSystemPrompt(agentId);
       const assistantText = await this.runClaude(agentId, text, whipSystemPrompt, whipTools);
       await this.delegateFromWhipOutput(assistantText);
 
@@ -287,7 +288,7 @@ export class AgentManager {
     this.callbacks.onTaskChange?.();
 
     const tools = resolveAllowedTools(agentId, role);
-    const systemPrompt = resolveSystemPrompt(agentId, role);
+    const systemPrompt = resolveSystemPrompt(agentId);
     const prompt = systemPrompt
       ? `Complete this task in the project at ${this.workingDirectory}: ${taskDescription}\n\nWork independently. Be thorough but concise. When done, summarize what you did.`
       : `You are the ${role} specialist. Complete this task in the project at ${this.workingDirectory}: ${taskDescription}\n\nWork independently. Be thorough but concise. When done, summarize what you did.`;
@@ -346,19 +347,25 @@ export class AgentManager {
 
   private runClaude(agentId: string, prompt: string, systemPrompt?: string, allowedTools?: string[]): Promise<string> {
     return new Promise((resolve, reject) => {
+      if (!this.workingDirectory) {
+        reject(new Error("Working directory not set"));
+        return;
+      }
+
       try {
-        validateWorkingDirectory(this.workingDirectory!);
+        validateWorkingDirectory(this.workingDirectory);
       } catch (err) {
         reject(err);
         return;
       }
 
       const claudePath = this.findClaudeBinary();
+      const workingDir = this.workingDirectory;
 
       const { args: claudeArgs } = buildClaudeArgs({ systemPrompt, allowedTools });
 
       const proc = spawn(claudePath, claudeArgs, {
-        cwd: this.workingDirectory!,
+        cwd: workingDir,
         env: {
           ...process.env,
           CLAUDECODE: undefined,

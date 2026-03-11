@@ -99,8 +99,8 @@ export class SidePanel {
     const entry = this.createLogEntry(event);
     this.logBody.prepend(entry);
 
-    while (this.logBody.children.length > MAX_LOG_ENTRIES) {
-      this.logBody.removeChild(this.logBody.lastChild!);
+    while (this.logBody.children.length > MAX_LOG_ENTRIES && this.logBody.lastChild) {
+      this.logBody.removeChild(this.logBody.lastChild);
     }
   }
 
