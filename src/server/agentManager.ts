@@ -3,7 +3,7 @@ import { existsSync, statSync } from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { AGENT_BY_ROLE, buildTeamDescription } from "../shared/agentRegistry.js";
+import { AGENT_BY_ROLE } from "../shared/agentRegistry.js";
 import type { AgentStatus } from "../shared/types.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -140,22 +140,6 @@ export function getToolsForRole(role: string): string[] {
   return AGENT_BY_ROLE[role]?.defaultTools ?? ["Read", "Glob", "Grep"];
 }
 
-const WHIP_SYSTEM_PROMPT = `You are the Whip/lead of a dev team. Your teammates and their specialties:
-${buildTeamDescription()}
-
-When given a task, analyze it and break it into subtasks. For each subtask, output a JSON block:
-\`\`\`task
-{"assign": "<agent-name>", "task": "<description of what to do>"}
-\`\`\`
-
-After defining tasks, output:
-\`\`\`task
-{"assign": "self", "task": "<what you will do yourself>"}
-\`\`\`
-
-If the task is simple enough for one agent, just do it yourself without delegating.
-Always start by reading relevant files to understand the codebase before assigning work.`;
-
 type StatusCallback = (agentId: string, status: AgentStatus, talkingTo?: string | null) => void;
 type EventCallback = (agentId: string, eventType: string, detail: string) => void;
 type FileChangeCallback = (filePath: string, action: "edit" | "create" | "delete", agentId?: string) => void;
@@ -214,7 +198,8 @@ export class AgentManager {
 
     try {
       const whipTools = resolveAllowedTools(agentId, "Whip");
-      const assistantText = await this.runClaude(agentId, text, WHIP_SYSTEM_PROMPT, whipTools);
+      const whipSystemPrompt = resolveSystemPrompt(agentId, "Whip");
+      const assistantText = await this.runClaude(agentId, text, whipSystemPrompt, whipTools);
       await this.delegateFromWhipOutput(assistantText);
 
       if (this.teammatePromises.size > 0) {

@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import path from "node:path";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import { loadAgentConfig, resolveAllowedTools, resolveSystemPrompt } from "../src/server/agentConfig.js";
-import { AGENT_REGISTRY } from "../src/shared/agentRegistry.js";
+import { AGENT_REGISTRY, buildTeamDescription } from "../src/shared/agentRegistry.js";
 
 describe("loadAgentConfig", () => {
   let configDir: string;
@@ -141,5 +141,15 @@ describe("resolveSystemPrompt", () => {
     const result = resolveSystemPrompt("agent-sceptic", "Sceptic", configDir);
 
     expect(result).toBeUndefined();
+  });
+
+  it("should expand {{team}} placeholder with team description", () => {
+    const config = { systemPrompt: "Your team:\n{{team}}\n\nDelegate work." };
+    writeFileSync(path.join(configDir, "whip.json"), JSON.stringify(config));
+
+    const result = resolveSystemPrompt("agent-whip", "Whip", configDir);
+
+    expect(result).toContain(buildTeamDescription());
+    expect(result).not.toContain("{{team}}");
   });
 });

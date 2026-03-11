@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { AGENT_BY_ID } from "../shared/agentRegistry.js";
+import { AGENT_BY_ID, buildTeamDescription } from "../shared/agentRegistry.js";
 import { getToolsForRole } from "./agentManager.js";
 
 const __filename = fileURLToPath(import.meta.url);
@@ -37,5 +37,6 @@ export function resolveAllowedTools(agentId: string, role: string, configDir = D
 
 export function resolveSystemPrompt(agentId: string, role: string, configDir = DEFAULT_CONFIG_DIR): string | undefined {
   const config = loadAgentConfig(agentId, configDir);
-  return config.systemPrompt;
+  if (!config.systemPrompt) return undefined;
+  return config.systemPrompt.replace("{{team}}", buildTeamDescription());
 }
